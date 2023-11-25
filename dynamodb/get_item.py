@@ -6,10 +6,8 @@ table = dynamodb.Table('users')
 
 response = table.get_item(
     Key={
-        'username': 'janedoe',
-        'last_name': 'Doe'
+        'username': 'bobsmith',
+        'last_name': 'Smith'
     }
 )
 print(response)
-item = response['Item']
-print(item)
