@@ -27,7 +27,7 @@ class ProgressPercentage(object):
             sys.stdout.flush()
 
 
-def upload_file(file_name, bucket, object_name=None):
+def upload_file(file_name, bucket, object_name=None, key=None):
     """Upload a file to an S3 bucket
 
     :param file_name: File to upload
@@ -43,11 +43,20 @@ def upload_file(file_name, bucket, object_name=None):
     # Upload the file
     s3_client = boto3.client('s3')
     try:
-        response = s3_client.upload_file(file_name, bucket, object_name, Callback=ProgressPercentage(file_name))
+        s3_client.upload_file(file_name, bucket, object_name)
     except ClientError as e:
         logging.error(e)
         return False
+    region = s3_client.get_bucket_location(Bucket=bucket)['LocationConstraint']
+    if region is None:
+        region = 'us-east-1'
+
+    if region == 'us-east-1':
+        object_url = f"https://{bucket}.s3.amazonaws.com/{object_name}"
+    else:
+        object_url = f"https://{bucket}.s3.{region}.amazonaws.com/{object_name}"
+    print(object_url)
     return True
 
 
-print(upload_file('recording-2023-07-02-22-22-13.webm', 'test-ifty-boto3', 'test-upload-using-boto3'))
+print(upload_file('order.PNG', 'anothernewbucketface', 'sdhfuehfus.PNG'))
